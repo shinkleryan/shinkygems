@@ -193,7 +193,7 @@ module Gem::InstallUpdateOptions
   # Default description for the gem install and update commands.
 
   def install_update_defaults_str
-    "--document=ri"
+    "--document=ri --conservative"
   end
 
 end
