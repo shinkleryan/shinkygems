@@ -615,7 +615,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_self_use_gemdeps
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("-") do
         FileUtils.mkdir_p "detect/a/b"
         FileUtils.mkdir_p "detect/a/Isolate"
@@ -775,7 +775,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_self_find_files_with_gemfile
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       cwd = File.expand_path("test/rubygems", PROJECT_DIR)
       actual_load_path = $LOAD_PATH.unshift(cwd).dup
 
@@ -1635,7 +1635,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_auto_activation_of_specific_gemdeps_file
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       a = util_spec "a", "1", nil, "lib/a.rb"
       b = util_spec "b", "1", nil, "lib/b.rb"
       c = util_spec "c", "1", nil, "lib/c.rb"
@@ -1659,7 +1659,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_auto_activation_of_used_gemdeps_file
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       a = util_spec "a", "1", nil, "lib/a.rb"
       b = util_spec "b", "1", nil, "lib/b.rb"
       c = util_spec "c", "1", nil, "lib/c.rb"
@@ -1685,7 +1685,9 @@ class TestGem < Gem::TestCase
   end
 
   def test_looks_for_gemdeps_files_automatically_from_binstubs
-    with_local_bundler do
+    path = File.join(@tempdir, "gd-tmp")
+
+    with_local_bundler_at(path) do
       a = util_spec "a", "1" do |s|
         s.executables = %w[foo]
         s.bindir = "exe"
@@ -1700,7 +1702,6 @@ class TestGem < Gem::TestCase
 
       install_specs a, b, c
 
-      path = File.join(@tempdir, "gd-tmp")
       install_gem a, :install_dir => path
       install_gem b, :install_dir => path
       install_gem c, :install_dir => path
@@ -1734,7 +1735,9 @@ class TestGem < Gem::TestCase
   end
 
   def test_looks_for_gemdeps_files_automatically_from_binstubs_in_parent_dir
-    with_local_bundler do
+    path = File.join(@tempdir, "gd-tmp")
+
+    with_local_bundler_at(path) do
       pend "IO.popen has issues on JRuby when passed :chdir" if Gem.java_platform?
 
       a = util_spec "a", "1" do |s|
@@ -1751,7 +1754,6 @@ class TestGem < Gem::TestCase
 
       install_specs a, b, c
 
-      path = File.join(@tempdir, "gd-tmp")
       install_gem a, :install_dir => path
       install_gem b, :install_dir => path
       install_gem c, :install_dir => path
@@ -1829,7 +1831,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       gem_deps_file = "gem.deps.rb".tap(&Gem::UNTAINT)
       spec = util_spec "a", 1
       install_specs spec
@@ -1851,7 +1853,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_ENV
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps(nil) do
         spec = util_spec "a", 1
 
@@ -1869,7 +1871,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_argument_missing
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       e = assert_raise ArgumentError do
         Gem.use_gemdeps "gem.deps.rb"
       end
@@ -1880,7 +1882,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_argument_missing_match_ENV
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("gem.deps.rb") do
         e = assert_raise ArgumentError do
           Gem.use_gemdeps "gem.deps.rb"
@@ -1893,7 +1895,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_automatic
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("-") do
         spec = util_spec "a", 1
         install_specs spec
@@ -1913,7 +1915,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_automatic_missing
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("-") do
         Gem.use_gemdeps
 
@@ -1923,7 +1925,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_disabled
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("") do
         spec = util_spec "a", 1
 
@@ -1941,7 +1943,7 @@ class TestGem < Gem::TestCase
   end
 
   def test_use_gemdeps_missing_gem
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("x") do
         File.open "x", "w" do |io|
           io.write 'gem "a"'
@@ -1965,7 +1967,7 @@ You may need to `bundle install` to install missing gems
   end
 
   def test_use_gemdeps_specific
-    with_local_bundler do
+    with_local_bundler_at(Gem.dir) do
       with_rubygems_gemdeps("x") do
         spec = util_spec "a", 1
         install_specs spec
@@ -2121,17 +2123,18 @@ You may need to `bundle install` to install missing gems
     ENV["RUBYGEMS_GEMDEPS"] = rubygems_gemdeps
   end
 
-  def with_local_bundler
+  def with_local_bundler_at(path)
+    require "bundler"
+
     # If bundler gemspec exists, add to stubs
     bundler_gemspec = File.expand_path("../../bundler/bundler.gemspec", __dir__)
     if File.exist?(bundler_gemspec)
-      Gem::Specification.dirs.unshift File.dirname(bundler_gemspec)
-      Gem::Specification.class_variable_set :@@stubs, nil
-      Gem::Specification.stubs
-      Gem::Specification.dirs.shift
-    end
+      target_gemspec_location = "#{path}/specifications/bundler-#{Bundler::VERSION}.gemspec"
 
-    require "bundler"
+      FileUtils.mkdir_p File.dirname(target_gemspec_location)
+
+      File.write target_gemspec_location, Gem::Specification.load(bundler_gemspec).to_ruby_for_cache
+    end
 
     yield
   ensure
