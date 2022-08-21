@@ -54,10 +54,10 @@ jobs:
           echo "========================="
           uname -a
           echo "========================="
-      - name: Install Dependencies and Run Test
-        run: |
-          rake setup
-          rake test
+      - name: Install Dependencies
+        run: rake setup
         env:
           BUNDLE_WITHOUT: lint
+      - name: Run Test
+        run: rake test
     timeout-minutes: 25
