@@ -28,7 +28,7 @@ jobs:
       - name: Setup ruby
         uses: ruby/setup-ruby@de6f5b9c340068d049670c6b6ae8dc94cff4667a # v1.125.0
         with:
-          ruby-version: jruby-9.3.9.0
+          ruby-version: jruby-9.4.0.0
           bundler: none
       - name: Prepare dependencies
         run: |
