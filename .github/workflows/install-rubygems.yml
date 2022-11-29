@@ -113,7 +113,7 @@ jobs:
         uses: actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc # v3.6.0
         with:
           distribution: temurin
-          java-version: 18.0.0
+          java-version: 19.0.1
         if: startsWith(matrix.ruby.name, 'jruby')
       - name: Install rubygems
         run: ruby setup.rb
