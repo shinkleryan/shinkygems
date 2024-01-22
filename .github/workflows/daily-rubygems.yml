@@ -31,7 +31,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler: none
 
-      - uses: dtolnay/rust-toolchain@e645b0cf01249a964ec099494d38d2da0f0b349f
+      - uses: dtolnay/rust-toolchain@be73d7920c329f220ce78e0234b8f96b7ae60248
         with:
           toolchain: ${{ matrix.cargo }}
           components: rustfmt
