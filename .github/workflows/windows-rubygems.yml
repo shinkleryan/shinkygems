@@ -33,7 +33,7 @@ jobs:
           - ruby: { name: "mswin", value: "mswin" }
             cargo: { target: x86_64-pc-windows-msvc, toolchain: stable } # mswin
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
       - name: Setup ruby
         uses: ruby/setup-ruby-pkgs@e5897b3f277d700f7b9e24b5819112945add74ff # v1.32.3
         with:
